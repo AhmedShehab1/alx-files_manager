@@ -1,14 +1,14 @@
 const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
-const crypto = require('crypto');
+const sha1 = require('sha1');
 const { v4: uuidv4 } = require('uuid');
 
-function hashPassword(password) {
-    return crypto.createHash('sha1').update(password).digest('hex');
+function hashPasswordWithSha1(password) {
+    return sha1(password);
 }
 
 function checkPassword(password, hash) {
-    const hashed_password = hashPassword(password);
+    const hashed_password = hashPasswordWithSha1(password);
 
     return hashed_password === hash;
 }
@@ -91,7 +91,7 @@ class UsersController {
 
         if (user) res.status(400).send('Already exist');
 
-        const hashed_password = hashPassword(password);
+        const hashed_password = hashPasswordWithSha1(password);
 
         const newUser = {
             email: email,
