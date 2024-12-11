@@ -28,7 +28,7 @@ class UsersController {
 
         const [email, password] = credentials.split(':');
 
-        const user = dbClient.getDocument("users", { email: email });
+        const user = await dbClient.getDocument("users", { email: email });
 
         if (!user) res.status(401).send('Unauthorized');
 
@@ -54,13 +54,13 @@ class UsersController {
 
         if (!userId) res.status(401).send('Unauthorized');
 
-        redisClient.del(key);
+        await redisClient.del(key);
 
         return res.status(204).send
 
     }
 
-    static getMe(req, res) {
+    static async getMe(req, res) {
 
         const token = req.headers['X-Token'];
 
@@ -68,11 +68,11 @@ class UsersController {
 
         const key = `auth_${token}`;
 
-        const userId = redisClient.get(key);
+        const userId = await redisClient.get(key);
 
         if (!userId) res.status(401).send('Unauthorized');
 
-        const user = dbClient.getDocument("users", { _id: userId });
+        const user = await dbClient.getDocument("users", { _id: userId });
 
         if (!user) res.status(401).send('Unauthorized');
 
@@ -80,14 +80,14 @@ class UsersController {
 
     }
 
-    static postNew(req, res) {
+    static async postNew(req, res) {
 
         const { email, password } = req.body;
         if (!email) res.status(400).send('Missing email');
 
         if (!password) res.status(400).send('Missing password');
 
-        const user = dbClient.getDocument("users", { email: email });
+        const user = await dbClient.getDocument("users", { email: email });
 
         if (user) res.status(400).send('Already exist');
 
@@ -98,7 +98,7 @@ class UsersController {
             password: hashed_password
         };
 
-        const _id = dbClient.insertDocument("users", newUser);
+        const _id = await dbClient.insertDocument("users", newUser);
 
         return res.status(201).json({ "_id": _id, "email": email });
     }
