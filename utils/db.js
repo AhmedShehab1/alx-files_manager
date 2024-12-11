@@ -1,6 +1,9 @@
+require('dotenv').config();
+
 // const { MongoClient } = require('mongodb');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const MONGODB_PASSWORD = process.env.MONGODB_PASSWORD;
+const MONGODB_USER = process.env.MONGODB_USER;
 
 class DBClient {
 
@@ -9,17 +12,11 @@ class DBClient {
     this.port = process.env.DB_PORT || '27017';
     this.database = process.env.DB_DATABASE || 'files_manager';
 
-    const uri = `mongodb+srv://mazen_atlam:${MONGODB_PASSWORD}@free-mongodb.jj4vz.mongodb.net/?retryWrites=true&w=majority&appName=Free-MongoDB`;
+    const uri = `mongodb+srv://${MONGODB_USER}:${MONGODB_PASSWORD}@free-mongodb.jj4vz.mongodb.net/?retryWrites=true&w=majority&appName=Free-MongoDB`;
     // const uri = `mongodb://${this.host}:${this.port}`;
 
     // this.client = new MongoClient(uri, { useUnifiedTopology: true });
-    this.client = new MongoClient(uri, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      }
-    });
+    this.client = new MongoClient(uri);
     
     this.db = null;
   }
@@ -88,4 +85,4 @@ const dbClient = new DBClient();
   await dbClient.connect();
 })();
 
-export default dbClient;
+module.exports = dbClient;
