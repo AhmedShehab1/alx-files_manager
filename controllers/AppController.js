@@ -1,12 +1,12 @@
 const redisClient = require('../utils/redis');
-const DBClient = require('../utils/db');
+const dbClient = require('../utils/db');
 
 class AppController {
 
     static getStatus(req, res) {
 
         return res.status(200).json(
-            {"redis": redisClient.isAlive(), "db": DBClient.isAlive()}
+            {"redis": redisClient.isAlive(), "db": dbClient.isAlive()}
         );
 
     }
@@ -14,7 +14,7 @@ class AppController {
     static async getStats(req, res) {
 
         return res.status(200).json(
-            {"users": await DBClient.nbUsers(), "files": await DBClient.nbFiles()}
+            {"users": await dbClient.nbUsers(), "files": await dbClient.nbFiles()}
         );
 
     }
