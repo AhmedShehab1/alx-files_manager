@@ -1,6 +1,7 @@
 const { MongoClient } = require('mongodb');
 
 class DBClient {
+
   constructor () {
     this.host = process.env.DB_HOST || 'localhost';
     this.port = process.env.DB_PORT || '27017';
@@ -37,19 +38,37 @@ class DBClient {
     if (!this.db) await this.connect();
     return await this.db.collection('files').countDocuments();
   }
-
-  async getDocument (collectionName, query) {
-    if (!this.db) await this.connect();
+  async insertDocument(collectionName, document) {
     try {
-      const collection = this.db.collection(collectionName);
-      const doc = await collection.findOne(query);
 
-      console.log('Found document: ', doc);
-      return doc;
+      const collection = db.collection(collectionName);
+      const result = await collection.insertOne(document);
+      console.log('Inserted document with ID:', result.insertedId);
+      return result.insertedId;
+      
     } catch (err) {
-      console.error('Error finding document:', err);
+
+      console.error('Error inserting document:', err);
+    
     }
   }
+  async getDocument(collectionName, query) {
+    if (!this.db) await this.connect();
+    try {
+
+      const collection = db.collection(collectionName);
+      const doc = await collection.findOne(query);
+      
+      console.log('Found document: ', doc);
+      return user;
+
+    } catch (err) {
+
+      console.error('Error finding document:', err);
+
+    }
+  }
+
 }
 
 const dbClient = new DBClient();

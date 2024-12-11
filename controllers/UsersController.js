@@ -3,98 +3,106 @@ const dbClient = require('../utils/db');
 const sha1 = require('sha1');
 const { v4: uuidv4 } = require('uuid');
 
-function hashPasswordWithSha1 (password) {
-  return sha1(password);
+function hashPasswordWithSha1(password) {
+    return sha1(password);
 }
 
-function checkPassword (password, hash) {
-  const hashedPassword = hashPasswordWithSha1(password);
+function checkPassword(password, hash) {
+    const hashed_password = hashPasswordWithSha1(password);
 
-  return hashedPassword === hash;
+    return hashed_password === hash;
 }
 
-function generateToken () {
-  return uuidv4();
+function generateToken() {
+    return uuidv4();
 }
 
 class UsersController {
-  static async getConnect (req, res) {
-    const authorization = req.headers.authorization;
 
-    const base64Credentials = authorization.split(' ')[1];
+    static async getConnect(req, res) {
+        const authorization = req.headers.authorization;
 
-    const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+        const base64Credentials = authorization.split(' ')[1];
 
-    const email = credentials.split(':')[0];
+        const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
 
-    const user = dbClient.getDocument('users', { email });
+        const [email, password] = credentials.split(':');
 
-    if (!user) res.status(401).send('Unauthorized');
+        const user = dbClient.getDocument("users", { email: email });
 
-    const token = generateToken();
+        if (!user) res.status(401).send('Unauthorized');
 
-    const key = `auth_${token}`;
+        const token = generateToken();
 
-    await redisClient.set(key, user._id.toString(), 86400);
+        const key = `auth_${token}`;
 
-    return res.status(200).json({ token });
-  }
+        await redisClient.set(key, user._id.toString(), 86400);
 
-  static async getDisconnect (req, res) {
-    const token = req.headers['X-Token'];
+        return res.status(200).json({ token: token });
 
-    if (!token) res.status(401).send('Unauthorized');
+    }
 
-    const key = `auth_${token}`;
+    static async getDisconnect(req, res) {
 
-    const userId = await redisClient.get(key);
+        const token = req.headers['X-Token'];
 
-    if (!userId) res.status(401).send('Unauthorized');
+        if (!token) res.status(401).send('Unauthorized');
 
-    redisClient.del(key);
+        const key = `auth_${token}`;
 
-    return res.status(204).send;
-  }
+        const userId = await redisClient.get(key);
 
-  static getMe (req, res) {
-    const token = req.headers['X-Token'];
+        if (!userId) res.status(401).send('Unauthorized');
 
-    if (!token) res.status(401).send('Unauthorized');
+        redisClient.del(key);
 
-    const key = `auth_${token}`;
+        return res.status(204).send
 
-    const userId = redisClient.get(key);
+    }
 
-    if (!userId) res.status(401).send('Unauthorized');
+    static getMe(req, res) {
 
-    const user = dbClient.getDocument('users', { _id: userId });
+        const token = req.headers['X-Token'];
 
-    if (!user) res.status(401).send('Unauthorized');
+        if (!token) res.status(401).send('Unauthorized');
 
-    return res.status(200).json({ _id: user._id, email: user.email });
-  }
+        const key = `auth_${token}`;
 
-  static postNew (req, res) {
-    const { email, password } = req.body;
-    if (!email) res.status(400).send('Missing email');
+        const userId = redisClient.get(key);
 
-    if (!password) res.status(400).send('Missing password');
+        if (!userId) res.status(401).send('Unauthorized');
 
-    const user = dbClient.getDocument('users', { email });
+        const user = dbClient.getDocument("users", { _id: userId });
 
-    if (user) res.status(400).send('Already exist');
+        if (!user) res.status(401).send('Unauthorized');
 
-    const hashedPassword = hashPasswordWithSha1(password);
+        return res.status(200).json({ "_id": user._id, "email": user.email });
 
-    const newUser = {
-      email,
-      password: hashedPassword
-    };
+    }
 
-    const _id = dbClient.insertDocument('users', newUser);
+    static postNew(req, res) {
 
-    return res.status(201).json({ _id, email });
-  }
+        const { email, password } = req.body;
+        if (!email) res.status(400).send('Missing email');
+
+        if (!password) res.status(400).send('Missing password');
+
+        const user = dbClient.getDocument("users", { email: email });
+
+        if (user) res.status(400).send('Already exist');
+
+        const hashed_password = hashPasswordWithSha1(password);
+
+        const newUser = {
+            email: email,
+            password: hashed_password
+        };
+
+        const _id = dbClient.insertDocument("users", newUser);
+
+        return res.status(201).json({ "_id": _id, "email": email });
+    }
+
 }
 
 module.exports = UsersController;
