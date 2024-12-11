@@ -5,7 +5,7 @@ class AppController {
 
     static getStatus(req, res) {
 
-        res.status(200).send(
+        return res.status(200).json(
             {"redis": redisClient.isAlive(), "db": DBClient.isAlive()}
         );
 
@@ -13,7 +13,7 @@ class AppController {
 
     static getStats(req, res) {
 
-        res.status(200).send(
+        return res.status(200).json(
             {"users": DBClient.nbUsers(), "files": DBClient.nbFiles()}
         );
 
