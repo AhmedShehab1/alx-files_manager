@@ -6,6 +6,9 @@ const { validateFileUpload } = require('../controllers/FilesController');
 
 const router = express.Router();
 
+router.post('/connect', UsersController.getConnect);
+router.post('/disconnect', UsersController.getDisconnect);
+router.post('/users/me', UsersController.getMe);
 router.post('/users', UsersController.postNew);
 router.get('/status', AppController.getStatus);
 router.get('/stats', AppController.getStats);
