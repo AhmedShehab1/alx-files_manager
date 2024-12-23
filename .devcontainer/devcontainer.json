@@ -1,7 +1,6 @@
 {
   "name": "Files Manager Dev Environment",
-  "dockerComposeFile": "../docker-compose.yml",
-  "service": "web",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "forwardPorts": [27017, 6379],
   "settings": {
     "terminal.integrated.defaultProfile.linux": "bash"
