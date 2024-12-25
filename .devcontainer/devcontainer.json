@@ -1,14 +1,22 @@
 {
-  "name": "Files Manager Dev Environment",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  "forwardPorts": [27017, 6379],
+  "name": "Files Manager Project",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
   "settings": {
     "terminal.integrated.defaultProfile.linux": "bash"
   },
   "extensions": [
-    "ms-python.python",
+    "dbaeumer.vscode-eslint",
+    "mongodb.mongodb-vscode",
     "ms-azuretools.vscode-docker"
   ],
+  "postCreateCommand": "npm install",
+  "forwardPorts": [3000],
   "remoteUser": "vscode",
-  "postCreateCommand": "pip install -r requirements.txt"
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    }
+  }
 }
