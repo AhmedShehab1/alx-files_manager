@@ -1,14 +1,15 @@
-# Use a base image with Python and other development tools
-FROM mcr.microsoft.com/devcontainers/python:3.10
+# Use the Node.js image from the devcontainer features
+ARG VARIANT="20"
+FROM mcr.microsoft.com/devcontainers/javascript-node:${VARIANT}
 
-# Install Redis and MongoDB
-RUN apt-get update && \
-    apt-get install -y redis-server mongodb && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Install app dependencies
+WORKDIR /workspace
+COPY package*.json ./
+RUN npm install
 
-# Expose ports for Redis and MongoDB
-EXPOSE 6379 27017
+# Copy app source code
+COPY . .
 
-# Start Redis and MongoDB when the container starts
-CMD service redis-server start && mongod --fork --logpath /var/log/mongodb.log && sleep infinity
+# Expose port and define default command
+EXPOSE 3000
+CMD ["npm", "start"]
