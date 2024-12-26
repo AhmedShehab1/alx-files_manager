@@ -1,9 +1,9 @@
-const redisClient = require('../utils/redis');
-const dbClient = require('../utils/db');
 const sha1 = require('sha1');
 const { v4: uuidv4 } = require('uuid');
+const redisClient = require('../utils/redis');
+const dbClient = require('../utils/db');
 
-function hashPasswordWithSha1 (password) {
+function hashPasswordWithSha1(password) {
   return sha1(password);
 }
 
@@ -13,13 +13,13 @@ function hashPasswordWithSha1 (password) {
 //   return hashedPassword === hash;
 // }
 
-function generateToken () {
+function generateToken() {
   return uuidv4();
 }
 
 class UsersController {
-  static async getConnect (req, res) {
-    const authorization = req.headers.authorization;
+  static async getConnect(req, res) {
+    const { authorization } = req.headers;
 
     const base64Credentials = authorization.split(' ')[1];
 
@@ -40,7 +40,7 @@ class UsersController {
     return res.status(200).json({ token });
   }
 
-  static async getDisconnect (req, res) {
+  static async getDisconnect(req, res) {
     const token = req.headers['X-Token'];
 
     if (!token) res.status(401).send('Unauthorized');
@@ -56,7 +56,7 @@ class UsersController {
     return res.status(204).send;
   }
 
-  static async getMe (req, res) {
+  static async getMe(req, res) {
     const token = req.headers['X-Token'];
 
     if (!token) res.status(401).send('Unauthorized');
@@ -74,21 +74,21 @@ class UsersController {
     return res.status(200).json({ _id: user._id, email: user.email });
   }
 
-  static async postNew (req, res) {
+  static async postNew(req, res) {
     const { email, password } = req.body;
-    if (!email) res.status(400).send('Missing email');
+    if (!email) return res.status(400).json({ error: 'Missing email' });
 
-    if (!password) res.status(400).send('Missing password');
+    if (!password) return res.status(400).json({ error: 'Missing password' });
 
     const user = await dbClient.getDocument('users', { email });
 
-    if (user) res.status(400).send('Already exist');
+    if (user) return res.status(400).json({ error: 'Already exist' });
 
     const hashedPassword = hashPasswordWithSha1(password);
 
     const newUser = {
       email,
-      password: hashedPassword
+      password: hashedPassword,
     };
 
     const id = await dbClient.insertDocument('users', newUser);
