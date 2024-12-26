@@ -91,9 +91,9 @@ class UsersController {
       password: hashedPassword
     };
 
-    const _id = await dbClient.insertDocument('users', newUser);
+    const id = await dbClient.insertDocument('users', newUser);
 
-    return res.status(201).json({ _id, email });
+    return res.status(201).json({ id, email });
   }
 }
 
