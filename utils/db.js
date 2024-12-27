@@ -60,7 +60,7 @@ class DBClient {
       if (query._id) {
         query._id = new ObjectId(query._id);
       }
-      
+
       const doc = await collection.findOne(query);
 
       console.log('Found document: ', doc);

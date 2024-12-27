@@ -1,14 +1,16 @@
-const redisClient = require('../utils/redis');
-const dbClient = require('../utils/db');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const redisClient = require('../utils/redis');
+const dbClient = require('../utils/db');
 
-function generateUUID () {
+function generateUUID() {
   return uuidv4();
 }
 
 const validateFileUpload = async (req, res, next) => {
-  const { name, type, parentId = 0, isPublic = false, data = undefined } = req.body;
+  const {
+    name, type, parentId = 0, isPublic = false, data = undefined,
+  } = req.body;
 
   if (!name) res.status(400).send('Missing name');
 
@@ -30,7 +32,7 @@ const validateFileUpload = async (req, res, next) => {
 };
 
 class FilesController {
-  static async postUpload (req, res) {
+  static async postUpload(req, res) {
     if (!req.headers['X-Token']) res.status(401).send('Unauthorized');
 
     const key = `auth_${req.headers['X-Token']}`;
@@ -39,7 +41,9 @@ class FilesController {
     const userId = await redisClient.get(key);
     if (!userId) res.status(401).send('Unauthorized');
 
-    const { name, type, parentId, isPublic, data } = req.body;
+    const {
+      name, type, parentId, isPublic, data,
+    } = req.body;
 
     if (type === 'folder') {
       const newFolderId = await dbClient.insertDocument('files', {
@@ -47,7 +51,7 @@ class FilesController {
         name,
         type,
         isPublic,
-        parentId
+        parentId,
       });
 
       const newFolder = {
@@ -56,7 +60,7 @@ class FilesController {
         name,
         type,
         isPublic,
-        parentId
+        parentId,
       };
 
       return res.status(201).json(newFolder);
@@ -79,7 +83,7 @@ class FilesController {
       type,
       isPublic,
       parentId,
-      localPath: `${FOLDER_PATH}/${fileUUID}`
+      localPath: `${FOLDER_PATH}/${fileUUID}`,
     });
   }
 }
