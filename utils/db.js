@@ -1,4 +1,5 @@
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
+require('dotenv').config();
 
 class DBClient {
   constructor() {
@@ -55,6 +56,11 @@ class DBClient {
     if (!this.db) await this.connect();
     try {
       const collection = this.db.collection(collectionName);
+
+      if (query._id) {
+        query._id = new ObjectId(query._id);
+      }
+
       const doc = await collection.findOne(query);
 
       console.log('Found document: ', doc);
