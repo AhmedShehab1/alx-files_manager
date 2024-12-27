@@ -2,7 +2,7 @@ const { MongoClient, ObjectId } = require('mongodb');
 require('dotenv').config();
 
 class DBClient {
-  constructor () {
+  constructor() {
     this.host = process.env.DB_HOST || 'localhost';
     this.port = process.env.DB_PORT || '27017';
     this.database = process.env.DB_DATABASE || 'files_manager';
@@ -14,7 +14,7 @@ class DBClient {
     this.db = null;
   }
 
-  async connect () {
+  async connect() {
     if (!this.db) {
       try {
         await this.client.connect();
@@ -26,21 +26,21 @@ class DBClient {
     }
   }
 
-  isAlive () {
+  isAlive() {
     return this.client.isConnected();
   }
 
-  async nbUsers () {
+  async nbUsers() {
     if (!this.db) await this.connect();
-    return await this.db.collection('users').countDocuments();
+    return this.db.collection('users').countDocuments();
   }
 
-  async nbFiles () {
+  async nbFiles() {
     if (!this.db) await this.connect();
-    return await this.db.collection('files').countDocuments();
+    return this.db.collection('files').countDocuments();
   }
 
-  async insertDocument (collectionName, document) {
+  async insertDocument(collectionName, document) {
     try {
       const collection = this.db.collection(collectionName);
       const result = await collection.insertOne(document);
@@ -49,9 +49,10 @@ class DBClient {
     } catch (err) {
       console.error('Error inserting document:', err);
     }
+    return undefined;
   }
 
-  async getDocument (collectionName, query) {
+  async getDocument(collectionName, query) {
     if (!this.db) await this.connect();
     try {
       const collection = this.db.collection(collectionName);
@@ -67,6 +68,7 @@ class DBClient {
     } catch (err) {
       console.error('Error finding document:', err);
     }
+    return undefined;
   }
 }
 
