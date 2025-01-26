@@ -5,12 +5,7 @@ const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
 
 class RedisClient {
   constructor() {
-    this.client = redis.createClient(
-        {
-            host: REDIS_HOST,
-            port: 6379,
-        },
-    );
+    this.client = redis.createClient();
 
     this.connected = true;
 
