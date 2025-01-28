@@ -1,10 +1,6 @@
-const sha1 = require('sha1');
 const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
-
-function hashPasswordWithSha1(password) {
-  return sha1(password);
-}
+const { hashPasswordWithSha1 } = require('../utils/utils');
 
 class UsersController {
   static async getMe(req, res) {
