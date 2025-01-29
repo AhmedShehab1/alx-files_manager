@@ -1,35 +1,8 @@
+import { generateUUID } from '../utils/utils';
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
 const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
 
-function generateUUID() {
-  return uuidv4();
-}
-
-const validateFileUpload = async (req, res, next) => {
-  const {
-    name, type, parentId = 0, isPublic = false, data = undefined,
-  } = req.body;
-
-  if (!name) res.status(400).send('Missing name');
-
-  if (!type) res.status(400).send('Missing type');
-
-  if ((type === 'file' || type === 'image') && !data) res.status(400).send('Missing data');
-
-  if (parentId) {
-    const parent = await dbClient.getDocument('files', { _id: parentId });
-
-    if (!parent) res.status(400).send('Parent not found');
-    if (parent.type !== 'folder') res.status(400).send('Parent is not a folder');
-  }
-
-  req.body.parentId = parentId;
-  req.body.isPublic = isPublic;
-
-  next();
-};
 
 class FilesController {
   static async postUpload(req, res) {
@@ -89,5 +62,3 @@ class FilesController {
 }
 
 module.exports = FilesController;
-
-exports.validateFileUpload = validateFileUpload;
